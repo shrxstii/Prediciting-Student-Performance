@@ -5,6 +5,8 @@ from models import db, StudentRecord
 from ml import regression_model, classifier_model, df, features, REQUIRED_CSV_COLUMNS
 from sklearn.metrics import mean_squared_error, r2_score, confusion_matrix, accuracy_score, classification_report
 import pandas as pd
+from flask import send_file
+import io
 
 student_bp = Blueprint("student", __name__)
 
@@ -64,24 +66,68 @@ def dashboard():
 def student_detail(student_id):
     if student_id < 0 or student_id >= len(df):
         return "Student not found.", 404
+
     X = df[features]
     predictions = regression_model.predict(X)
     importance = regression_model.feature_importances_
+
     student = df.iloc[student_id]
     predicted_grade = round(float(predictions[student_id]), 2)
     risk, _ = classify_risk(predicted_grade)
+
+    # ✅ averages
+    avg_g1 = df["G1"].mean()
+    avg_g2 = df["G2"].mean()
+    avg_study = df["studytime"].mean()
+    avg_fail = df["failures"].mean()
+    avg_abs = df["absences"].mean()
+
+    # ✅ SHAP-like values (green + red)
+    shap_values = [
+        float(student["G1"] - avg_g1),
+        float(student["G2"] - avg_g2),
+        float(student["studytime"] - avg_study),
+        float(student["failures"] - avg_fail),
+        float(student["absences"] - avg_abs)
+    ]
+
+    # ✅ Interventions
+    interventions = []
+
+    if student["absences"] > 10:
+        interventions.append({"issue": "High Absences", "action": "Improve attendance", "color": "red"})
+
+    if student["G1"] < 10:
+        interventions.append({"issue": "Low G1 Score", "action": "Start tutoring", "color": "amber"})
+
+    if student["G2"] < 10:
+        interventions.append({"issue": "Low G2 Score", "action": "Practice weekly tests", "color": "amber"})
+
+    if student["failures"] > 0:
+        interventions.append({"issue": "Past Failures", "action": "Assign mentor", "color": "red"})
+
+    if student["studytime"] < 2:
+        interventions.append({"issue": "Low Study Time", "action": "Increase study hours", "color": "green"})
+
+    if not interventions:
+        interventions.append({"issue": "Good Performance", "action": "Keep it up", "color": "green"})
+
     return render_template(
         "student_detail.html",
         student=student,
         predicted_grade=predicted_grade,
         risk=risk,
         importance=importance.tolist(),
-        avg_g1=round(df["G1"].mean(), 2),
-        avg_g2=round(df["G2"].mean(), 2),
-        avg_abs=round(df["absences"].mean(), 2),
-        avg_study=round(df["studytime"].mean(), 2),
-        avg_fail=round(df["failures"].mean(), 2),
+        shap_values=shap_values,
+        interventions=interventions,
+        avg_g1=round(avg_g1, 2),
+        avg_g2=round(avg_g2, 2),
+        avg_abs=round(avg_abs, 2),
+        avg_study=round(avg_study, 2),
+        avg_fail=round(avg_fail, 2),
+        student_id=student_id
     )
+
 
 @student_bp.route("/upload-data")
 @login_required
@@ -204,3 +250,90 @@ def simulate():
         return jsonify({"error": "Invalid input values."}), 400
     if not (0 <= g1 <= 20):
         return jsonify({"error": "G1 must be between 0 and 20."}), 40
+    
+# ── PDF Export — routes/student.py mein add karo simulate ke baad ──────────
+# Pehle install karo: pip install reportlab
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+import io
+
+@student_bp.route("/export-student-pdf/<int:student_id>")
+@login_required
+def export_student_pdf(student_id):
+    if student_id < 0 or student_id >= len(df):
+        return "Student not found.", 404
+
+    X = df[features]
+    predictions = regression_model.predict(X)
+
+    student = df.iloc[student_id]
+    predicted_grade = round(float(predictions[student_id]), 2)
+    risk, _ = classify_risk(predicted_grade)
+
+    # ✅ Interventions
+    interventions = []
+
+    if student["absences"] > 10:
+        interventions.append("High Absences — Improve attendance")
+
+    if student["G1"] < 10:
+        interventions.append("Low G1 Score — Start tutoring")
+
+    if student["G2"] < 10:
+        interventions.append("Low G2 Score — Practice tests")
+
+    if student["failures"] > 0:
+        interventions.append("Past Failures — Assign mentor")
+
+    if student["studytime"] < 2:
+        interventions.append("Low Study Time — Increase study hours")
+
+    if not interventions:
+        interventions.append("Good Performance — Keep it up")
+
+    # ✅ PDF build
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.pagesizes import A4
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+
+    styles = getSampleStyleSheet()
+    story = []
+
+    # Title
+    story.append(Paragraph("Student Risk Analysis Report", styles["Title"]))
+    story.append(Spacer(1, 12))
+
+    # Data
+    story.append(Paragraph(f"Predicted Grade: {predicted_grade}/20", styles["Normal"]))
+    story.append(Paragraph(f"Risk Level: {risk}", styles["Normal"]))
+    story.append(Spacer(1, 12))
+
+    story.append(Paragraph("Student Details:", styles["Heading2"]))
+    story.append(Paragraph(f"G1: {student['G1']}", styles["Normal"]))
+    story.append(Paragraph(f"G2: {student['G2']}", styles["Normal"]))
+    story.append(Paragraph(f"Study Time: {student['studytime']}", styles["Normal"]))
+    story.append(Paragraph(f"Failures: {student['failures']}", styles["Normal"]))
+    story.append(Paragraph(f"Absences: {student['absences']}", styles["Normal"]))
+    story.append(Spacer(1, 12))
+
+    # Interventions
+    story.append(Paragraph("Recommended Interventions:", styles["Heading2"]))
+    for item in interventions:
+        story.append(Paragraph(f"- {item}", styles["Normal"]))
+
+    doc.build(story)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"student_{student_id}.pdf",
+        mimetype="application/pdf"
+    )
