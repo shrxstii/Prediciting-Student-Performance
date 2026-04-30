@@ -2,27 +2,37 @@
 
 ---
 
-## 📌 Project Overview
+## 🚀 Overview
 
-This project is a full-stack AI-powered academic analytics system designed to predict student performance early in the semester and identify at-risk students before academic failure occurs.
+An end-to-end **AI-powered academic analytics platform** designed to **predict student performance early** and proactively identify at-risk students before academic failure occurs.
 
-The platform integrates Machine Learning, interactive visualization, explainable AI techniques, and role-based authentication to provide educators with actionable insights for proactive intervention.
-
-This system transforms traditional reactive academic monitoring into a predictive and decision-support framework.
+This system transforms traditional reactive monitoring into a **predictive, explainable, and decision-support framework** for educators.
 
 ---
 
+## 🖥️ Application Preview
+
+### 📊 Main Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### 📈 Admin Analytics Dashboard
+![Analytics](screenshots/analytics.png)
+
+
+### 🔍 Student Risk Analysis (SHAP + Interventions)
+
+![Student](screenshots/student.png)
+
 ## 🎯 Problem Statement
 
-Conventional academic evaluation systems identify struggling students only after significant academic decline.
+Traditional academic systems detect struggling students **too late**.
 
 This project introduces:
 
-- Early grade prediction using ML
-- Automated risk classification
-- Explainable AI insights
-- Fairness & bias analysis
-- Interactive educator dashboard
+* Early performance prediction
+* Automated risk classification
+* Explainable AI insights
+* Data-driven intervention recommendations
 
 ---
 
@@ -30,207 +40,200 @@ This project introduces:
 
 ### 🔹 Models Used
 
-- **Random Forest Regressor** → Final Grade Prediction  
-- **Random Forest Classifier** → Risk Category Prediction  
-
----
+* **Random Forest Regressor** → Predict final grade
+* **Random Forest Classifier** → Predict risk category
 
 ### 🔹 Input Features
 
-- G1 (First Internal Grade)  
-- G2 (Second Internal Grade)  
-- Study Time  
-- Past Failures  
-- Absences  
+* G1 (First Internal Grade)
+* G2 (Second Internal Grade)
+* Study Time
+* Past Failures
+* Absences
+
+### 🔹 Target
+
+* G3 (Final Grade)
 
 ---
 
-### 🔹 Target Variable
+## 📊 Risk Classification
 
-- G3 (Final Grade)  
-
----
-
-## 📊 Risk Classification Logic
-
-Based on predicted grade (0–20 scale):
-
-- **High Risk** → Grade < 10  
-- **Medium Risk** → 10 – 14  
-- **Low Risk** → ≥ 15  
+| Category       | Condition  |
+| -------------- | ---------- |
+| 🔴 High Risk   | Grade < 10 |
+| 🟡 Medium Risk | 10 – 14    |
+| 🟢 Low Risk    | ≥ 15       |
 
 ---
 
 ## 📈 Model Performance
 
-- Mean Squared Error (MSE): ~2.63  
-- R² Score: Strong predictive capability  
-- Classification Accuracy: ~87%  
-- Confusion Matrix integrated into dashboard  
+* **MSE:** ~1.06
+* **R² Score:** ~0.94
+* **Classification Accuracy:** ~96%
+
+✔ Strong predictive performance
+✔ Balanced classification results
 
 ---
 
-## 💡 Key System Features
+## 💡 Key Features
 
-### 🔍 AI & Analytics
+### 🤖 AI & Explainability
 
-- Risk Prediction (Regression + Classification)  
-- AI Confidence Score  
-- Modal-Based Explainability (Feature Contribution Analysis)  
-- SHAP-style approximation logic  
-- Fairness Analysis (Gender & Age-group bias evaluation)  
-- Confusion Matrix Visualization  
+* Grade Prediction (Regression)
+* Risk Classification (Classification)
+* SHAP-style Explainability (feature impact)
+* Feature Importance Visualization
+* AI-Based Intervention Suggestions
 
 ---
 
-### 📊 Interactive Dashboard
+### 📊 Dashboard & Analytics
 
-- Animated KPI Cards  
-- Risk Distribution (Pie / Bar Toggle)  
-- DataTable Filtering & Search  
-- Student Progress Visualization  
-- Premium Gradient Table Styling  
-- CSV Report Export (Admin-only)  
+* Risk Distribution (Pie + Bar charts)
+* Student vs Class Comparison
+* Feature Contribution Graphs
+* Interactive Data Tables
+* Real-time KPI Cards
+
+---
+
+### ⚖️ Fairness Analysis
+
+* Gender-based risk comparison
+* Age-group bias detection
+* Ethical AI evaluation
 
 ---
 
 ### 🔐 Authentication System
 
-- Premium Glassmorphism Login Interface  
-- Sign In / Sign Up Toggle  
-- Multi-user Demo Accounts  
-- Role-Based Access Control (Admin / Teacher / Student)  
-- Session Tracking (Login Time Displayed)  
-- Conditional Feature Visibility (Export restricted to Admin)  
+* Role-based login (Admin / Teacher / Student)
+* Session tracking
+* Restricted features (Admin-only export)
 
 ---
 
-### 🌗 UI/UX Enhancements
+### 📄 Report Generation
 
-- SaaS-style Glassmorphism Login  
-- Animated Gradient Background  
-- Light/Dark Theme Toggle  
-- Smooth Hover & Transition Effects  
-- Premium Shadow & Card Design  
-- Responsive Layout (Bootstrap 5)  
+* PDF export for student analysis
+* AI-based recommendations included
 
 ---
 
 ## 🏗️ System Architecture
 
-1. Data Collection (CSV Dataset)  
-2. Feature Selection & Processing  
-3. Model Training (Random Forest)  
-4. Risk Classification Layer  
-5. Explainability Engine  
-6. Flask Backend API  
-7. Interactive Frontend Dashboard  
+1. Data Input (CSV Dataset)
+2. Feature Engineering
+3. ML Model Prediction
+4. Risk Classification
+5. Explainability Layer
+6. Flask Backend
+7. Interactive Frontend
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- Python  
-- Flask  
-- Pandas  
-- Scikit-learn  
-- Joblib  
+
+* Python
+* Flask
+* Pandas
+* Scikit-learn
+* ReportLab (PDF export)
+* Joblib
 
 ### Frontend
-- HTML5  
-- CSS3  
-- Bootstrap 5  
-- Chart.js  
-- DataTables  
-- JavaScript  
 
-### Authentication
-- Session-Based Authentication  
-- Role-Based Access Control  
+* HTML5
+* CSS3
+* Bootstrap 5
+* Chart.js
+* JavaScript
 
-### Version Control
-- Git  
-- GitHub  
+### Database
+* SQLite (students.db)
+
+### Others
+
+* Git & GitHub
+* ReportLab (PDF Generation)
 
 ---
 
-
-▶️ How to Run Locally
-
-1️⃣ Clone Repository
+## ▶️ How to Run Locally
 
 ```bash
 git clone https://github.com/Nikki31Chaudhary/Prediciting-Student-Performance.git
 cd Prediciting-Student-Performance
-
-2️⃣Install Dependencies
-pip install flask pandas scikit-learn joblib
-
-3️⃣ Run Application
+pip install -r requirements.txt
 python app.py
+```
 
+Open:
 
-
-Open browser:
-
+```
 http://127.0.0.1:5000
+```
 
-🔐 Demo Login Credentials
-Username	Password
-admin	123456
-teacher	123456
-student	123456
+---
 
-🌐 Deployment (Planned Phase)
-The system is structured for deployment using:
+## 🔐 Demo Credentials
 
-Render / Railway / AWS
+| Role    | Username | Password |
+| ------- | -------- | -------- |
+| Admin   | admin    | 123456   |
+| Teacher | teacher  | 123456   |
+| Student | student  | 123456   |
 
-Gunicorn (Production Server)
+---
 
-Environment Variables for Secret Keys
+## 🌍 Deployment (Future Scope)
 
-Scalable Cloud Infrastructure
+* Render / Railway / AWS
+* Gunicorn for production
+* Environment variable configuration
 
-📈 Expected Impact
-Early detection of academically vulnerable students
+---
 
-Improved retention rates
+## 📈 Impact
 
-Transparent AI-based academic evaluation
+* Early detection of at-risk students
+* Improved academic outcomes
+* Transparent AI-based decisions
+* Data-driven educational insights
 
-Data-driven decision support for educators
+---
 
-🔮 Future Enhancements
-Database-backed user authentication (SQLite/PostgreSQL)
+## 🔮 Future Enhancements
 
-Password hashing & secure authentication
+* Database-backed authentication
+* Secure password hashing
+* Real SHAP integration
+* Real-time model retraining
+* CI/CD deployment
+* Advanced AI recommendations
 
-OpenAI-powered personalized academic recommendations
+---
 
-PDF analytics export
+## 👩‍💻 Authors
 
-Real-time model retraining
+* **Shristi Upadhyay**
+* **Nikki Chaudhary**
 
-Advanced fairness & bias auditing
+---
 
-CI/CD deployment pipeline
+## 🎯 Academic Project Highlights
 
-👩‍💻 Developed By
-Shristi Upadhyay
+✔ Machine Learning Deployment
+✔ Explainable AI (XAI)
+✔ Full-Stack Development
+✔ Data Visualization
+✔ Role-Based System Design
 
-Nikki Chaudhary
+---
 
-📜 Academic Portfolio Project
-This project demonstrates:
-
-Machine Learning model deployment
-
-Explainable AI integration
-
-Full-stack dashboard development
-
-Role-based authentication
-
-Professional UI/UX Implementation
+⭐ If you found this project useful, consider giving it a star!
